@@ -18,13 +18,14 @@ pub mod unchecked_account_test {
 
     use super::*;
 
-    pub fn initialize<'c: 'info, 'info>(
-      ctx: Context<'_, '_, 'c, 'info, Initialize<'info>>, 
+    pub fn initialize(
+      ctx: Context<Initialize>, 
       data_source_name: String, 
       asset_id: String, 
       timestamp: i64) -> Result<()> {
   
-      let account: Account<'_, PriceUpdateV2> = Account::<PriceUpdateV2>::try_from(&ctx.accounts.oracle_account).expect("Some error");
+        let data = ctx.accounts.oracle_account.try_borrow_mut_data()?;
+        let account = PriceUpdateV2::try_deserialize(&mut data.as_ref()).expect("Error deserializing account data");
   
       
       // &ctx.accounts.record_price(data_source_name, asset_id, timestamp);
